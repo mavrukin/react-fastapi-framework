@@ -143,6 +143,9 @@ backend/*.db
 bazel-*
 .bazel/
 
+# GitHub Actions
+.github/workflows/*.yml.bak
+
 # Node.js / React
 frontend/node_modules/
 frontend/.pnp
