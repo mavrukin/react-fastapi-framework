@@ -133,6 +133,8 @@ dmypy.json
 # FastAPI specific
 *.db
 *.sqlite
+backend/app.db
+backend/*.db
 
 # Pre-commit
 .pre-commit-config.yaml.bak
@@ -140,3 +142,19 @@ dmypy.json
 # Bazel
 bazel-*
 .bazel/
+
+# Node.js / React
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+frontend/coverage/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.eslintcache
+frontend/.DS_Store

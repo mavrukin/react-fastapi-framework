@@ -16,27 +16,58 @@ repos:
       - id: mixed-line-ending
       - id: requirements-txt-fixer
 
+  # Python code formatting and linting
   - repo: https://github.com/psf/black
     rev: 24.3.0
     hooks:
       - id: black
         language_version: python3
         args: [--line-length=88]
+        files: ^backend/
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
         args: [--profile=black]
+        files: ^backend/
 
   - repo: https://github.com/pycqa/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
-        args: [--max-line-length=88, --extend-ignore=E203, E501]
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,E501
+        files: ^backend/
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
     hooks:
       - id: mypy
         args: [--ignore-missing-imports]
+        files: ^backend/
+
+  # React/TypeScript formatting and linting
+  - repo: local
+    hooks:
+      - id: prettier-frontend
+        name: prettier (frontend)
+        entry: bash .pre-commit-prettier.sh
+        language: system
+        types: [file]
+        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css)$
+        exclude: ^frontend/(node_modules|build)/
+        pass_filenames: true
+        require_serial: true
+
+      - id: eslint-frontend
+        name: eslint (frontend)
+        entry: bash .pre-commit-eslint.sh
+        language: system
+        types: [file]
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        exclude: ^frontend/(node_modules|build)/
+        pass_filenames: false
+        always_run: false
+        require_serial: true
