@@ -15,8 +15,8 @@ class Settings(BaseSettings):
 
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:3000",  # React dev server
-        "http://localhost:8000",  # FastAPI dev server
+        AnyHttpUrl("http://localhost:3000"),  # React dev server
+        AnyHttpUrl("http://localhost:8000"),  # FastAPI dev server
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
