@@ -14,12 +14,9 @@ from alembic import context  # type: ignore[attr-defined]  # noqa: E402
 from app.core.config import settings  # noqa: E402
 
 # Import all models so Alembic can detect them
-# Import base model first
-from app.models.base import BaseModel  # noqa: F401, E402
-
-# Import all other models here as they are created
-# from app.models.user import User  # noqa: F401
-# from app.models.item import Item  # noqa: F401
+# Import actual table models here as they are created
+# from app.models.user import User  # noqa: F401, E402
+# from app.models.item import Item  # noqa: F401, E402
 
 
 # this is the Alembic Config object, which provides
