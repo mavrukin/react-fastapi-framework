@@ -71,3 +71,38 @@ repos:
         pass_filenames: false
         always_run: false
         require_serial: true
+
+      - id: frontend-tests
+        name: frontend tests
+        entry: bash .pre-commit-frontend-tests.sh
+        language: system
+        types: [file]
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        exclude: ^frontend/(node_modules|build)/
+        pass_filenames: false
+        always_run: false
+        require_serial: true
+
+      - id: frontend-build
+        name: frontend build
+        entry: bash .pre-commit-frontend-build.sh
+        language: system
+        types: [file]
+        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css)$
+        exclude: ^frontend/(node_modules|build)/
+        pass_filenames: false
+        always_run: false
+        require_serial: true
+
+  # Backend tests (matches GitHub Actions)
+  - repo: local
+    hooks:
+      - id: backend-tests
+        name: backend tests
+        entry: bash .pre-commit-backend-tests.sh
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false
+        always_run: false
+        require_serial: true

@@ -148,19 +148,30 @@ npm test -- --coverage
 
 ## Pre-commit Hooks
 
-Pre-commit hooks are configured to automatically:
+Pre-commit hooks are configured to automatically run the **same checks as GitHub Actions** to catch issues locally before pushing:
+
+### Backend Checks
 - Format Python code with Black
 - Sort imports with isort
 - Lint Python code with flake8
 - Type check Python code with mypy
+- **Run backend tests with pytest** (matches GitHub Actions)
+
+### Frontend Checks
 - Format TypeScript/JavaScript code with Prettier
 - Lint TypeScript/JavaScript code with ESLint
+- **Run frontend tests** (matches GitHub Actions)
+- **Build frontend application** (matches GitHub Actions)
+
+### General Checks
 - Check for common issues (trailing whitespace, large files, etc.)
 
-Hooks run automatically on `git commit`. To run manually:
+Hooks run automatically on `git commit` when relevant files change. To run all hooks manually:
 ```bash
 pre-commit run --all-files
 ```
+
+**Note**: The test and build hooks will skip gracefully if dependencies aren't installed (e.g., `frontend/node_modules` doesn't exist), but you should install dependencies first for a complete check.
 
 ## Development Workflow
 

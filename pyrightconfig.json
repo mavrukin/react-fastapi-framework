@@ -1,0 +1,19 @@
+{
+  "include": ["backend/app"],
+  "exclude": ["**/__pycache__", "**/node_modules", "**/.*", "**/venv", "**/.venv"],
+  "pythonVersion": "3.14",
+  "pythonPlatform": "All",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "pythonVersion": "3.14",
+      "pythonPlatform": "All",
+      "extraPaths": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages"
+      ]
+    }
+  ]
+}
