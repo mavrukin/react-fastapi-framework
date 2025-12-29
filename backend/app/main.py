@@ -14,9 +14,16 @@ app = FastAPI(
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:
+    # Convert AnyHttpUrl to string and normalize for CORS matching
+    # AnyHttpUrl normalizes URLs with trailing slashes, but browsers send without
+    cors_origins = []
+    for origin in settings.BACKEND_CORS_ORIGINS:
+        origin_str = str(origin).rstrip("/")
+        cors_origins.append(origin_str)
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
