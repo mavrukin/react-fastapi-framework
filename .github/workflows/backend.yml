@@ -1,0 +1,93 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+      - 'requirements-dev.txt'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+      - 'requirements-dev.txt'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt', 'requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r backend/requirements.txt
+          pip3 install -r requirements-dev.txt
+
+      - name: Run pre-commit hooks (Python only)
+        run: |
+          pip3 install pre-commit
+          pre-commit run --hook-stage manual black isort flake8 mypy --all-files || true
+
+      - name: Run tests with pytest
+        working-directory: ./backend
+        env:
+          DATABASE_URL: sqlite:///./test.db
+        run: |
+          pytest --cov=app --cov-report=xml --cov-report=term-missing -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r backend/requirements.txt
+          pip3 install -r requirements-dev.txt
+
+      - name: Run black
+        run: |
+          black --check backend/
+
+      - name: Run isort
+        run: |
+          isort --check-only backend/
+
+      - name: Run flake8
+        run: |
+          flake8 backend/ --max-line-length=88 --extend-ignore=E203,E501
+
+      - name: Run mypy
+        run: |
+          mypy backend/ --ignore-missing-imports

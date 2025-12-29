@@ -1,0 +1,83 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: |
+          rm -rf node_modules
+          npm install --legacy-peer-deps
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm test -- --coverage --watchAll=false
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: |
+          rm -rf node_modules
+          npm install --legacy-peer-deps
+
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build

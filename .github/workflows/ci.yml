@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt', 'requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r backend/requirements.txt
+          pip3 install -r requirements-dev.txt
+
+      - name: Run tests
+        working-directory: ./backend
+        env:
+          DATABASE_URL: sqlite:///./test.db
+        run: |
+          pytest --cov=app --cov-report=xml --cov-report=term-missing -v
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  backend-lint:
+    name: Backend Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r backend/requirements.txt
+          pip3 install -r requirements-dev.txt
+
+      - name: Run black
+        run: black --check backend/
+
+      - name: Run isort
+        run: isort --check-only backend/
+
+      - name: Run flake8
+        run: flake8 backend/ --max-line-length=88 --extend-ignore=E203,E501
+
+      - name: Run mypy
+        run: mypy backend/ --ignore-missing-imports
+
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: |
+          rm -rf node_modules
+          npm install --legacy-peer-deps
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm test -- --coverage --watchAll=false
+
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
