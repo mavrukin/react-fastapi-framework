@@ -169,6 +169,21 @@ pre-commit run --all-files
 3. Pre-commit hooks will run automatically on commit
 4. Run tests locally before pushing
 5. Create a pull request
+6. All GitHub Actions must pass before merging (see Branch Protection below)
+
+## Branch Protection
+
+The `main` branch is protected and requires:
+- All GitHub Actions workflows to pass
+- At least one code review approval
+- All conversations to be resolved
+
+See `.github/BRANCH_PROTECTION.md` for detailed setup instructions.
+
+**Quick Setup** (requires GitHub CLI):
+```bash
+./.github/setup-branch-protection.sh
+```
 
 ## Database Configuration
 
