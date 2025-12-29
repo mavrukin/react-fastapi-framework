@@ -1,9 +1,13 @@
 #!/bin/bash
 # Pre-commit hook script for prettier
+# This matches the GitHub Actions workflow: runs prettier on all frontend files
+
+set -e
 
 if [ ! -d "frontend/node_modules" ]; then
-  echo "Skipping prettier: frontend/node_modules not found. Run 'npm install' in frontend/ first."
-  exit 0
+  echo "ERROR: frontend/node_modules not found. Run 'npm install' in frontend/ first."
+  echo "Prettier check cannot run without dependencies."
+  exit 1
 fi
 
 cd frontend || exit 1
@@ -24,34 +28,33 @@ for file in "$@"; do
   fi
 done
 
+# If no files provided, check all files (shouldn't happen with pass_filenames: true)
+if [ ${#files[@]} -eq 0 ]; then
+  echo "No files provided to prettier hook"
+  exit 0
+fi
+
 # Run prettier on the files and check if any were modified
-if [ ${#files[@]} -gt 0 ]; then
-  # Create temporary copies to compare
-  temp_dir=$(mktemp -d)
-  for file in "${files[@]}"; do
-    if [ -f "$file" ]; then
-      cp "$file" "$temp_dir/$(basename "$file")"
+modified_files=()
+for file in "${files[@]}"; do
+  if [ -f "$file" ]; then
+    # Create a temporary copy to compare
+    temp_file=$(mktemp)
+    cp "$file" "$temp_file"
+
+    # Run prettier on the file
+    npx prettier --write "$file" >/dev/null 2>&1
+
+    # Check if file was modified
+    if ! diff -q "$file" "$temp_file" >/dev/null 2>&1; then
+      modified_files+=("$file")
     fi
-  done
 
-  # Run prettier
-  npx prettier --write "${files[@]}"
-
-  # Check if any files were modified
-  modified=false
-  for file in "${files[@]}"; do
-    if [ -f "$file" ] && [ -f "$temp_dir/$(basename "$file")" ]; then
-      if ! diff -q "$file" "$temp_dir/$(basename "$file")" >/dev/null 2>&1; then
-        modified=true
-        break
-      fi
-    fi
-  done
-
-  rm -rf "$temp_dir"
-
-  if [ "$modified" = true ]; then
-    echo "Prettier made changes to the above files. Please stage them and commit again."
-    exit 1
+    rm -f "$temp_file"
   fi
+done
+
+if [ ${#modified_files[@]} -gt 0 ]; then
+  echo "Prettier made changes to the above files. Please stage them and commit again."
+  exit 1
 fi
