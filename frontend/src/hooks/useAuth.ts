@@ -40,13 +40,16 @@ export function useAuth(): UseAuthReturn {
     }
   }, []);
 
-  const login = useCallback((email: string, authToken: string, name?: string) => {
-    const userData: User = { email, name };
-    setUser(userData);
-    setToken(authToken);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-    localStorage.setItem(AUTH_TOKEN_KEY, authToken);
-  }, []);
+  const login = useCallback(
+    (email: string, authToken: string, name?: string) => {
+      const userData: User = { email, name };
+      setUser(userData);
+      setToken(authToken);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+      localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+    },
+    []
+  );
 
   const logout = useCallback(() => {
     setUser(null);

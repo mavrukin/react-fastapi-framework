@@ -4,12 +4,7 @@
 
 import React from 'react';
 import { Button, Menu, MenuItem, Box } from '@mui/material';
-import {
-  AccountCircle,
-  Google,
-  Facebook,
-  Apple,
-} from '@mui/icons-material';
+import { AccountCircle, Google, Facebook, Apple } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import { AUTH_PROVIDERS } from '../types/auth';
 
