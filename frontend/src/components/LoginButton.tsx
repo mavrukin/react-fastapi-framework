@@ -29,14 +29,20 @@ const LoginButton: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleProviderLogin = (provider: 'google' | 'facebook' | 'apple') => {
+  const handleProviderLogin = async (
+    provider: 'google' | 'facebook' | 'apple'
+  ) => {
     handleClose();
-    // Mock login for now - in production, this would trigger OAuth flow
-    // For demo purposes, we'll simulate a login
-    const mockEmail = `user@${provider}.com`;
-    const mockToken = `mock_token_${provider}_${Date.now()}`;
-    const mockName = `User from ${provider}`;
-    login(mockEmail, mockToken, mockName);
+    try {
+      const { initiateOAuth } = await import('../services/auth');
+      const { token, email, name } = await initiateOAuth(provider);
+      login(email, token, name);
+    } catch (error) {
+      console.error('OAuth login failed:', error);
+      alert(
+        `Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   };
 
   const handleLogout = () => {

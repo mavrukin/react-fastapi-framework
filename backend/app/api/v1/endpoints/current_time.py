@@ -15,15 +15,23 @@ def get_user_email(authorization: Optional[str] = Header(None)) -> Optional[str]
     if not authorization:
         return None
 
-    # For now, we'll use a simple mock token format
-    # In production, this would decode a JWT token
-    if authorization.startswith("Bearer mock_token_"):
-        # Extract email from mock token format: mock_token_provider_timestamp
-        # For demo, we'll return a mock email based on the token
-        parts = authorization.replace("Bearer ", "").split("_")
-        if len(parts) >= 3:
-            provider = parts[2]
-            return f"user@{provider}.com"
+    # Extract token from Bearer header
+    if authorization.startswith("Bearer "):
+        token = authorization.replace("Bearer ", "")
+        # Try to decode as JWT token
+        from app.core.security import get_user_email_from_token
+
+        email = get_user_email_from_token(token)
+        if email:
+            return email
+
+        # Fallback: support old mock token format for backward compatibility
+        if token.startswith("mock_token_"):
+            parts = token.split("_")
+            if len(parts) >= 3:
+                provider = parts[2]
+                return f"user@{provider}.com"
+
     return None
 
 

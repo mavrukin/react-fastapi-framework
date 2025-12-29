@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginButton from './components/LoginButton';
 import LandingPage from './pages/LandingPage';
+import AuthCallback from './pages/AuthCallback';
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const App: React.FC = () => {
         <Box component="main" sx={{ flexGrow: 1 }}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
           </Routes>
         </Box>
       </Box>
