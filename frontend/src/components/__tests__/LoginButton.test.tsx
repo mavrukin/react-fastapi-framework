@@ -9,9 +9,12 @@ import { ThemeProvider } from '@mui/material';
 import LoginButton from '../LoginButton';
 import theme from '../../theme';
 import * as authHook from '../../hooks/useAuth';
+import * as authService from '../../services/auth';
 
 // Mock the useAuth hook
 jest.mock('../../hooks/useAuth');
+// Mock the auth service
+jest.mock('../../services/auth');
 
 describe('LoginButton', () => {
   const mockLogin = jest.fn();
@@ -72,6 +75,15 @@ describe('LoginButton', () => {
   });
 
   it('calls login when selecting a provider', async () => {
+    const mockInitiateOAuth = authService.initiateOAuth as jest.MockedFunction<
+      typeof authService.initiateOAuth
+    >;
+    mockInitiateOAuth.mockResolvedValue({
+      token: 'test-jwt-token',
+      email: 'user@google.com',
+      name: 'Test User',
+    });
+
     const user = userEvent.setup();
     render(
       <ThemeProvider theme={theme}>
@@ -86,11 +98,12 @@ describe('LoginButton', () => {
     await user.click(googleOption);
 
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.stringContaining('@google.com'),
-        expect.stringContaining('mock_token'),
-        expect.any(String)
-      );
+      expect(mockInitiateOAuth).toHaveBeenCalledWith('google');
     });
+    expect(mockLogin).toHaveBeenCalledWith(
+      'user@google.com',
+      'test-jwt-token',
+      'Test User'
+    );
   });
 });
