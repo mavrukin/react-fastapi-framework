@@ -28,9 +28,7 @@ jobs:
       - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.npm
-            frontend/node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
@@ -44,11 +42,8 @@ jobs:
       - name: Install Node.js dependencies
         working-directory: ./frontend
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --legacy-peer-deps
-          else
-            npm install --legacy-peer-deps
-          fi
+          rm -rf node_modules
+          npm install --legacy-peer-deps
 
       - name: Install pre-commit
         run: pip3 install pre-commit
