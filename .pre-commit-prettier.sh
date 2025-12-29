@@ -24,7 +24,34 @@ for file in "$@"; do
   fi
 done
 
-# Run prettier on the files
+# Run prettier on the files and check if any were modified
 if [ ${#files[@]} -gt 0 ]; then
+  # Create temporary copies to compare
+  temp_dir=$(mktemp -d)
+  for file in "${files[@]}"; do
+    if [ -f "$file" ]; then
+      cp "$file" "$temp_dir/$(basename "$file")"
+    fi
+  done
+
+  # Run prettier
   npx prettier --write "${files[@]}"
+
+  # Check if any files were modified
+  modified=false
+  for file in "${files[@]}"; do
+    if [ -f "$file" ] && [ -f "$temp_dir/$(basename "$file")" ]; then
+      if ! diff -q "$file" "$temp_dir/$(basename "$file")" >/dev/null 2>&1; then
+        modified=true
+        break
+      fi
+    fi
+  done
+
+  rm -rf "$temp_dir"
+
+  if [ "$modified" = true ]; then
+    echo "Prettier made changes to the above files. Please stage them and commit again."
+    exit 1
+  fi
 fi
