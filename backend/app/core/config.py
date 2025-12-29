@@ -13,20 +13,33 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
 
-    # CORS
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
+    # CORS - use Union to allow string input from .env, then convert to List[AnyHttpUrl]
+    BACKEND_CORS_ORIGINS: Union[str, List[AnyHttpUrl]] = [
         AnyHttpUrl("http://localhost:3000"),  # React dev server
         AnyHttpUrl("http://localhost:8000"),  # FastAPI dev server
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    def assemble_cors_origins(
+        cls, v: Union[str, List[str], List[AnyHttpUrl]]
+    ) -> List[AnyHttpUrl]:
+        """Convert CORS origins to List[AnyHttpUrl] format."""
+        if isinstance(v, str):
+            # Handle comma-separated string from .env file
+            return [
+                AnyHttpUrl(origin.strip()) for origin in v.split(",") if origin.strip()
+            ]
+        elif isinstance(v, list):
+            # Convert list of strings to list of AnyHttpUrl
+            result = []
+            for item in v:
+                if isinstance(item, str):
+                    result.append(AnyHttpUrl(item))
+                elif isinstance(item, AnyHttpUrl):
+                    result.append(item)
+            return result
+        return v
 
     # Database
     DATABASE_URL: str = "sqlite:///./app.db"
