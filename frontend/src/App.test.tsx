@@ -23,8 +23,9 @@ describe('App', () => {
         <App />
       </ThemeProvider>
     );
-    const titleElement = screen.getByText(/Reach FastAPI Framework/i);
-    expect(titleElement).toBeInTheDocument();
+    // There are multiple "Reach FastAPI Framework" texts (header and banner)
+    const titles = screen.getAllByText(/Reach FastAPI Framework/i);
+    expect(titles.length).toBeGreaterThan(0);
   });
 
   test('renders login button', () => {

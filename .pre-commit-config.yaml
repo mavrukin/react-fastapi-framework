@@ -8,6 +8,8 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+        args: ['--maxkb=1000']
+        exclude: ^frontend/package-lock\.json$
       - id: check-json
       - id: check-toml
       - id: check-merge-conflict
@@ -69,7 +71,7 @@ repos:
         files: ^frontend/.*\.(ts|tsx|js|jsx)$
         exclude: ^frontend/(node_modules|build)/
         pass_filenames: false
-        always_run: false
+        always_run: true
         require_serial: true
 
       - id: frontend-tests
@@ -80,7 +82,7 @@ repos:
         files: ^frontend/.*\.(ts|tsx|js|jsx)$
         exclude: ^frontend/(node_modules|build)/
         pass_filenames: false
-        always_run: false
+        always_run: true
         require_serial: true
 
       - id: frontend-build
@@ -91,7 +93,7 @@ repos:
         files: ^frontend/.*\.(ts|tsx|js|jsx|json|css)$
         exclude: ^frontend/(node_modules|build)/
         pass_filenames: false
-        always_run: false
+        always_run: true
         require_serial: true
 
   # Backend tests (matches GitHub Actions)

@@ -34,7 +34,11 @@ describe('CurrentTime', () => {
     mockGetCurrentTime.mockImplementation(
       () =>
         new Promise((resolve) => {
-          setTimeout(() => resolve({ current_time: '2024-01-01T12:00:00', timezone: 'UTC' }), 100);
+          setTimeout(
+            () =>
+              resolve({ current_time: '2024-01-01T12:00:00', timezone: 'UTC' }),
+            100
+          );
         })
     );
 
@@ -62,8 +66,8 @@ describe('CurrentTime', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Current time:/)).toBeInTheDocument();
-      expect(screen.getByText(/2024-01-01T12:00:00/)).toBeInTheDocument();
     });
+    expect(screen.getByText(/2024-01-01T12:00:00/)).toBeInTheDocument();
   });
 
   it('displays user email and time when authenticated', async () => {

@@ -37,7 +37,9 @@ describe('Full-stack Integration', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText(/Reach FastAPI Framework/i)).toBeInTheDocument();
+    // There are multiple "Reach FastAPI Framework" texts (header and banner)
+    const titles = screen.getAllByText(/Reach FastAPI Framework/i);
+    expect(titles.length).toBeGreaterThan(0);
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
@@ -55,8 +57,8 @@ describe('Full-stack Integration', () => {
 
     await waitFor(() => {
       expect(mockGetCurrentTime).toHaveBeenCalled();
-      expect(screen.getByText(/Current time:/)).toBeInTheDocument();
     });
+    expect(screen.getByText(/Current time:/)).toBeInTheDocument();
   });
 
   it('displays personalized message when user is logged in', async () => {
